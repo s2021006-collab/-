@@ -99,13 +99,27 @@
             background: #fffcfa;
         }
 
-        /* ★ キャラクター画像を小さくする */
+        /* =========================
+           キャラクター画像
+           ========================= */
+
         .chara-img {
             width: 35px !important;
-            height: auto !important;
+            height: 35px !important;
             max-width: 35px !important;
+            max-height: 35px !important;
+
+            object-fit: contain;
+
             display: block;
-            margin: 0 auto 10px;
+            margin: 0 auto 10px auto;
+        }
+
+        .total-g {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--main);
+            margin: 5px 0;
         }
 
         .calc-btn {
@@ -120,6 +134,10 @@
             margin-top: 20px;
             cursor: pointer;
         }
+
+        .calc-btn:active {
+            transform: scale(0.98);
+        }
     </style>
 </head>
 
@@ -133,8 +151,10 @@
         カードで選んだ食材をチェックして量を選ぼう！
     </div>
 
+
     <form id="menuForm">
 
+        <!-- 🟡 主食 -->
         <div class="section-title title-y">
             🟡 主食・エネルギー
         </div>
@@ -142,6 +162,7 @@
         <div class="item-grid" id="group-y"></div>
 
 
+        <!-- 🔴 主菜 -->
         <div class="section-title title-r">
             🔴 主菜・からだ作り
         </div>
@@ -149,6 +170,7 @@
         <div class="item-grid" id="group-r"></div>
 
 
+        <!-- 🟢 副菜 -->
         <div class="section-title title-g">
             🟢 副菜・コンディショニング
         </div>
@@ -166,6 +188,10 @@
 
     </form>
 
+
+    <!-- =========================
+         結果表示
+         ========================= -->
 
     <div
         class="result-box"
@@ -192,7 +218,11 @@
 
         <p
             id="feedbackMsg"
-            style="font-size: 0.95rem; margin-top: 10px; line-height: 1.4;"
+            style="
+                font-size: 0.95rem;
+                margin-top: 10px;
+                line-height: 1.4;
+            "
         ></p>
 
     </div>
@@ -202,404 +232,455 @@
 
 <script>
 
-const foods = [
+    /* =========================
+       食材データ
+       ========================= */
 
-    /* 🟡 主食・エネルギー */
+    const foods = [
 
-    {
-        id: 'f1',
-        name: '米',
-        cat: 'y',
-        base: 150
-    },
+        /* 🟡 主食・エネルギー */
 
-    {
-        id: 'f2',
-        name: 'パン',
-        cat: 'y',
-        base: 100
-    },
+        {
+            id: 'f1',
+            name: '米',
+            cat: 'y',
+            base: 150
+        },
 
-    {
-        id: 'f3',
-        name: 'パスタ',
-        cat: 'y',
-        base: 150
-    },
+        {
+            id: 'f2',
+            name: 'パン',
+            cat: 'y',
+            base: 100
+        },
 
-    {
-        id: 'f4',
-        name: 'うどん',
-        cat: 'y',
-        base: 180
-    },
+        {
+            id: 'f3',
+            name: 'パスタ',
+            cat: 'y',
+            base: 150
+        },
 
-    {
-        id: 'f5',
-        name: '中華麺',
-        cat: 'y',
-        base: 150
-    },
+        {
+            id: 'f4',
+            name: 'うどん',
+            cat: 'y',
+            base: 180
+        },
 
-    {
-        id: 'f6',
-        name: 'そうめん',
-        cat: 'y',
-        base: 150
-    },
+        {
+            id: 'f5',
+            name: '中華麺',
+            cat: 'y',
+            base: 150
+        },
 
-    {
-        id: 'f7',
-        name: 'さつまいも',
-        cat: 'y',
-        base: 80
-    },
+        {
+            id: 'f6',
+            name: 'そうめん',
+            cat: 'y',
+            base: 150
+        },
 
-    {
-        id: 'f8',
-        name: '栗',
-        cat: 'y',
-        base: 40
-    },
+        {
+            id: 'f7',
+            name: 'さつまいも',
+            cat: 'y',
+            base: 80
+        },
 
-    {
-        id: 'f9',
-        name: '里芋',
-        cat: 'y',
-        base: 60
-    },
+        {
+            id: 'f8',
+            name: '栗',
+            cat: 'y',
+            base: 40
+        },
 
-
-    /* 🔴 主菜・からだ作り */
-
-    {
-        id: 'f10',
-        name: '牛ひき肉',
-        cat: 'r',
-        base: 60
-    },
-
-    {
-        id: 'f11',
-        name: '豚ひき肉',
-        cat: 'r',
-        base: 60
-    },
-
-    {
-        id: 'f12',
-        name: '鶏ひき肉',
-        cat: 'r',
-        base: 60
-    },
-
-    {
-        id: 'f13',
-        name: '鶏肉',
-        cat: 'r',
-        base: 80
-    },
-
-    {
-        id: 'f14',
-        name: '豚ロース',
-        cat: 'r',
-        base: 80
-    },
-
-    {
-        id: 'f15',
-        name: 'タイ',
-        cat: 'r',
-        base: 70
-    },
-
-    {
-        id: 'f16',
-        name: 'マグロ',
-        cat: 'r',
-        base: 70
-    },
-
-    {
-        id: 'f17',
-        name: 'イカ',
-        cat: 'r',
-        base: 60
-    },
-
-    {
-        id: 'f18',
-        name: 'エビ',
-        cat: 'r',
-        base: 60
-    },
-
-    {
-        id: 'f19',
-        name: '鮭',
-        cat: 'r',
-        base: 70
-    },
-
-    {
-        id: 'f20',
-        name: 'あさり',
-        cat: 'r',
-        base: 40
-    },
-
-    {
-        id: 'f21',
-        name: '卵',
-        cat: 'r',
-        base: 50
-    },
-
-    {
-        id: 'f22',
-        name: '豆腐',
-        cat: 'r',
-        base: 60
-    },
-
-    {
-        id: 'f23',
-        name: '納豆',
-        cat: 'r',
-        base: 40
-    },
-
-    {
-        id: 'f24',
-        name: '牛乳',
-        cat: 'r',
-        base: 100
-    },
-
-    {
-        id: 'f25',
-        name: 'チーズ',
-        cat: 'r',
-        base: 20
-    },
-
-    {
-        id: 'f26',
-        name: 'ヨーグルト',
-        cat: 'r',
-        base: 80
-    },
+        {
+            id: 'f9',
+            name: '里芋',
+            cat: 'y',
+            base: 60
+        },
 
 
-    /* 🟢 副菜・コンディショニング */
+        /* 🔴 主菜・からだ作り */
 
-    {
-        id: 'f27',
-        name: 'れんこん',
-        cat: 'g',
-        base: 40
-    },
+        {
+            id: 'f10',
+            name: '牛ひき肉',
+            cat: 'r',
+            base: 60
+        },
 
-    {
-        id: 'f28',
-        name: 'ぎんなん',
-        cat: 'g',
-        base: 15
-    },
+        {
+            id: 'f11',
+            name: '豚ひき肉',
+            cat: 'r',
+            base: 60
+        },
 
-    {
-        id: 'f29',
-        name: 'しめじ',
-        cat: 'g',
-        base: 30
-    },
+        {
+            id: 'f12',
+            name: '鶏ひき肉',
+            cat: 'r',
+            base: 60
+        },
 
-    {
-        id: 'f30',
-        name: '春菊',
-        cat: 'g',
-        base: 30
-    },
+        {
+            id: 'f13',
+            name: '鶏肉',
+            cat: 'r',
+            base: 80
+        },
 
-    {
-        id: 'f31',
-        name: '柿',
-        cat: 'g',
-        base: 50
-    },
+        {
+            id: 'f14',
+            name: '豚ロース',
+            cat: 'r',
+            base: 80
+        },
 
-    {
-        id: 'f32',
-        name: 'ぶどう',
-        cat: 'g',
-        base: 50
-    },
+        {
+            id: 'f15',
+            name: 'タイ',
+            cat: 'r',
+            base: 70
+        },
 
-    {
-        id: 'f33',
-        name: 'ごぼう',
-        cat: 'g',
-        base: 30
-    },
+        {
+            id: 'f16',
+            name: 'マグロ',
+            cat: 'r',
+            base: 70
+        },
 
-    {
-        id: 'f34',
-        name: 'バター',
-        cat: 'g',
-        base: 10
+        {
+            id: 'f17',
+            name: 'イカ',
+            cat: 'r',
+            base: 60
+        },
+
+        {
+            id: 'f18',
+            name: 'エビ',
+            cat: 'r',
+            base: 60
+        },
+
+        {
+            id: 'f19',
+            name: '鮭',
+            cat: 'r',
+            base: 70
+        },
+
+        {
+            id: 'f20',
+            name: 'あさり',
+            cat: 'r',
+            base: 40
+        },
+
+        {
+            id: 'f21',
+            name: '卵',
+            cat: 'r',
+            base: 50
+        },
+
+        {
+            id: 'f22',
+            name: '豆腐',
+            cat: 'r',
+            base: 60
+        },
+
+        {
+            id: 'f23',
+            name: '納豆',
+            cat: 'r',
+            base: 40
+        },
+
+        {
+            id: 'f24',
+            name: '牛乳',
+            cat: 'r',
+            base: 100
+        },
+
+        {
+            id: 'f25',
+            name: 'チーズ',
+            cat: 'r',
+            base: 20
+        },
+
+        {
+            id: 'f26',
+            name: 'ヨーグルト',
+            cat: 'r',
+            base: 80
+        },
+
+
+        /* 🟢 副菜・コンディショニング */
+
+        {
+            id: 'f27',
+            name: 'れんこん',
+            cat: 'g',
+            base: 40
+        },
+
+        {
+            id: 'f28',
+            name: 'ぎんなん',
+            cat: 'g',
+            base: 15
+        },
+
+        {
+            id: 'f29',
+            name: 'しめじ',
+            cat: 'g',
+            base: 30
+        },
+
+        {
+            id: 'f30',
+            name: '春菊',
+            cat: 'g',
+            base: 30
+        },
+
+        {
+            id: 'f31',
+            name: '柿',
+            cat: 'g',
+            base: 50
+        },
+
+        {
+            id: 'f32',
+            name: 'ぶどう',
+            cat: 'g',
+            base: 50
+        },
+
+        {
+            id: 'f33',
+            name: 'ごぼう',
+            cat: 'g',
+            base: 30
+        },
+
+        {
+            id: 'f34',
+            name: 'バター',
+            cat: 'g',
+            base: 10
+        }
+
+    ];
+
+
+    /* =========================
+       食材カードを表示
+       ========================= */
+
+    function renderFoods() {
+
+        foods.forEach(f => {
+
+            const container =
+                document.getElementById(`group-${f.cat}`);
+
+            const div =
+                document.createElement('div');
+
+            div.className = 'item-card';
+
+            div.innerHTML = `
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        id="chk_${f.id}"
+                        onchange="toggleVol('${f.id}')"
+                    >
+
+                    ${f.name}
+
+                </label>
+
+                <select
+                    id="vol_${f.id}"
+                    class="vol-select"
+                >
+
+                    <option value="0.7">
+                        少なめ
+                    </option>
+
+                    <option
+                        value="1.0"
+                        selected
+                    >
+                        ふつう
+                    </option>
+
+                    <option value="1.3">
+                        多め
+                    </option>
+
+                </select>
+
+            `;
+
+            container.appendChild(div);
+
+        });
+
     }
 
-];
 
+    /* =========================
+       量の選択欄を表示・非表示
+       ========================= */
 
-function renderFoods() {
-
-    foods.forEach(f => {
-
-        const container =
-            document.getElementById(`group-${f.cat}`);
-
-        const div =
-            document.createElement('div');
-
-        div.className = 'item-card';
-
-        div.innerHTML = `
-
-            <label>
-                <input
-                    type="checkbox"
-                    id="chk_${f.id}"
-                    onchange="toggleVol('${f.id}')"
-                >
-
-                ${f.name}
-
-            </label>
-
-            <select
-                id="vol_${f.id}"
-                class="vol-select"
-            >
-
-                <option value="0.7">
-                    少なめ
-                </option>
-
-                <option
-                    value="1.0"
-                    selected
-                >
-                    ふつう
-                </option>
-
-                <option value="1.3">
-                    多め
-                </option>
-
-            </select>
-
-        `;
-
-        container.appendChild(div);
-
-    });
-
-}
-
-
-function toggleVol(id) {
-
-    const chk =
-        document.getElementById(`chk_${id}`);
-
-    const vol =
-        document.getElementById(`vol_${id}`);
-
-    vol.style.display =
-        chk.checked ? 'block' : 'none';
-
-}
-
-
-function calculate() {
-
-    let total = 0;
-
-    foods.forEach(f => {
+    function toggleVol(id) {
 
         const chk =
-            document.getElementById(`chk_${f.id}`);
+            document.getElementById(`chk_${id}`);
 
-        if (chk && chk.checked) {
+        const vol =
+            document.getElementById(`vol_${id}`);
 
-            const rate =
-                parseFloat(
-                    document.getElementById(`vol_${f.id}`).value
-                );
+        if (chk.checked) {
 
-            total +=
-                Math.round(f.base * rate);
+            vol.style.display = 'block';
+
+        } else {
+
+            vol.style.display = 'none';
 
         }
 
-    });
-
-
-    document.getElementById('totalGram').innerText =
-        `${total} g`;
-
-
-    let msg = "";
-
-
-    if (total === 0) {
-
-        msg =
-            "食材をひとつ以上えらんでね！";
-
-    }
-
-    else if (total < 450) {
-
-        msg =
-            "やや控えめなボリューム！塾や部活がある日はおやつをプラスすると安心だよ。";
-
-    }
-
-    else if (total <= 700) {
-
-        msg =
-            "中高生にピッタリの標準的なバランス量！午後もしっかりエネルギーが持続するよ✨";
-
-    }
-
-    else {
-
-        msg =
-            "しっかり大盛りボリューム！運動部やガッツリ動く日に最高のスタミナ弁当だね！";
-
     }
 
 
-    document.getElementById('feedbackMsg').innerText =
-        msg;
+    /* =========================
+       合計計算
+       ========================= */
+
+    function calculate() {
+
+        let total = 0;
 
 
-    document.getElementById('result').style.display =
-        'block';
+        foods.forEach(f => {
+
+            const chk =
+                document.getElementById(`chk_${f.id}`);
 
 
-    window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: 'smooth'
-    });
+            if (chk && chk.checked) {
 
-}
+                const rate =
+                    parseFloat(
+                        document
+                            .getElementById(`vol_${f.id}`)
+                            .value
+                    );
 
 
-renderFoods();
+                total +=
+                    Math.round(
+                        f.base * rate
+                    );
+
+            }
+
+        });
+
+
+        /* 合計重量 */
+
+        document
+            .getElementById('totalGram')
+            .innerText = `${total} g`;
+
+
+        /* =========================
+           メッセージ
+           ========================= */
+
+        let msg = "";
+
+
+        if (total === 0) {
+
+            msg =
+                "食材をひとつ以上えらんでね！";
+
+        }
+
+        else if (total < 450) {
+
+            msg =
+                "やや控えめなボリューム！塾や部活がある日はおやつをプラスすると安心だよ。";
+
+        }
+
+        else if (total <= 700) {
+
+            msg =
+                "中高生にピッタリの標準的なバランス量！午後もしっかりエネルギーが持続するよ✨";
+
+        }
+
+        else {
+
+            msg =
+                "しっかり大盛りボリューム！運動部やガッツリ動く日に最高のスタミナ弁当だね！";
+
+        }
+
+
+        document
+            .getElementById('feedbackMsg')
+            .innerText = msg;
+
+
+        /* 結果を表示 */
+
+        document
+            .getElementById('result')
+            .style.display = 'block';
+
+
+        /* 結果までスクロール */
+
+        window.scrollTo({
+
+            top: document.body.scrollHeight,
+
+            behavior: 'smooth'
+
+        });
+
+    }
+
+
+    /* =========================
+       ページ読み込み時に実行
+       ========================= */
+
+    renderFoods();
 
 </script>
 
