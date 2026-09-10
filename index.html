@@ -21,9 +21,9 @@
         .item-card input { margin-right: 5px; }
         .vol-select { display: none; margin-top: 5px; width: 100%; font-size: 0.75rem; padding: 3px; }
         
-        .result-box { margin-top: 25px; padding: 15px; border: 3px solid var(--main); border-radius: 15px; text-align: center; background: #fffcfa; }
-        .total-g { font-size: 2rem; font-weight: bold; color: var(--main); }
-        .chara-img { width: 70px; height: auto; margin-bottom: 5px; }
+        .result-box { margin-top: 25px; padding: 20px; border: 3px solid var(--main); border-radius: 15px; text-align: center; background: #fffcfa; }
+        .total-g { font-size: 2.2rem; font-weight: bold; color: var(--main); margin: 5px 0; }
+        .chara-img { width: 120px; height: auto; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
         .calc-btn { width: 100%; padding: 15px; background: var(--main); color: white; border: none; border-radius: 25px; font-size: 1.1rem; font-weight: bold; margin-top: 20px; cursor: pointer; }
     </style>
 </head>
@@ -47,23 +47,21 @@
     </form>
 
     <div class="result-box" id="result" style="display:none;">
-        <img src="chara.png" class="chara-img" alt="キャラ">
+        <img src="IMG_1014 2.png" class="chara-img" alt="キャラクター">
         <div>お弁当の合計重量</div>
         <div class="total-g" id="totalGram">0 g</div>
-        <p id="feedbackMsg" style="font-size: 0.9rem; margin-top: 10px;"></p>
+        <p id="feedbackMsg" style="font-size: 0.95rem; margin-top: 10px; line-height: 1.4;"></p>
     </div>
 </div>
 
 <script>
 const foods = [
-    // 黄（主食系） base: ふつうのg数
     { id:'f1', name:'米', cat:'y', base:150 }, { id:'f2', name:'パン', cat:'y', base:100 },
     { id:'f3', name:'パスタ', cat:'y', base:150 }, { id:'f4', name:'うどん', cat:'y', base:180 },
     { id:'f5', name:'中華麺', cat:'y', base:150 }, { id:'f6', name:'そうめん', cat:'y', base:150 },
     { id:'f7', name:'さつまいも', cat:'y', base:80 }, { id:'f8', name:'栗', cat:'y', base:40 },
     { id:'f9', name:'里芋', cat:'y', base:60 },
 
-    // 赤（主菜系）
     { id:'f10', name:'牛ひき肉', cat:'r', base:60 }, { id:'f11', name:'豚ひき肉', cat:'r', base:60 },
     { id:'f12', name:'鶏ひき肉', cat:'r', base:60 }, { id:'f13', name:'鶏肉', cat:'r', base:80 },
     { id:'f14', name:'豚ロース', cat:'r', base:80 }, { id:'f15', name:'タイ', cat:'r', base:70 },
@@ -74,7 +72,6 @@ const foods = [
     { id:'f24', name:'牛乳', cat:'r', base:100 }, { id:'f25', name:'チーズ', cat:'r', base:20 },
     { id:'f26', name:'ヨーグルト', cat:'r', base:80 },
 
-    // 緑（副菜系）
     { id:'f27', name:'れんこん', cat:'g', base:40 }, { id:'f28', name:'ぎんなん', cat:'g', base:15 },
     { id:'f29', name:'しめじ', cat:'g', base:30 }, { id:'f30', name:'春菊', cat:'g', base:30 },
     { id:'f31', name:'柿', cat:'g', base:50 }, { id:'f32', name:'ぶどう', cat:'g', base:50 },
