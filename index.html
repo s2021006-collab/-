@@ -91,16 +91,16 @@
       background: #fffcfa;
     }
 
-    /* キャラクター画像 */
-.chara-img {
-    width: 120px !important;
-    height: 120px !important;
-    max-width: 120px !important;
-    max-height: 120px !important;
-    object-fit: contain;
-    display: block;
-    margin: 0 auto 10px auto;
-}
+    /* キャラクター画像（サイズ変更箇所） */
+    .chara-img {
+      width: 80px; /* ★ここで大きさを自由に調整できます */
+      height: auto;
+      max-width: 100%;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 10px auto;
+    }
+
     .total-g {
       font-size: 2.2rem;
       font-weight: bold;
@@ -255,7 +255,7 @@
         msg = "やや控えめなボリューム！塾や部活がある日はおやつをプラスすると安心だよ。";
       } else if (total <= 700) {
         msg = "中高生にピッタリの標準的なバランス量！午後もしっかりエネルギーが持続するよ✨";
-      } else {
+      } else if (total > 700) {
         msg = "しっかり大盛りボリューム！運動部やガッツリ動く日に最高のスタミナ弁当だね！";
       }
 
